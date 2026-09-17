@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -278,9 +277,6 @@ class _CashlyLogoPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
 
     // Lingkaran luar (koin)
     final strokePaint = Paint()

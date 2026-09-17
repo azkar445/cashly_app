@@ -33,7 +33,12 @@ class InsightScreen extends StatelessWidget {
 
   Map<String,double> get _catSummary {
     final map=<String,double>{};
-    for (final tx in transactions) { if (!tx.isIncome) { final k=tx.category??"Lainnya"; map[k]=(map[k]??0)+tx.amount; } }
+    for (final tx in transactions) {
+      if (!tx.isIncome) {
+        final k = tx.category.isNotEmpty ? tx.category : "Lainnya";
+        map[k] = (map[k] ?? 0) + tx.amount;
+      }
+    }
     return map;
   }
 
@@ -45,8 +50,6 @@ class InsightScreen extends StatelessWidget {
     final topCat=sorted.isNotEmpty?sorted.first.key:null;
     final topAmt=sorted.isNotEmpty?sorted.first.value:0.0;
     final bottom=MediaQuery.of(context).padding.bottom;
-
-    // Analytics
     final score = FinancialAnalyticsService.calculateScore(transactions);
 
     return Scaffold(
@@ -82,8 +85,9 @@ class InsightScreen extends StatelessWidget {
           ])),
         ),
       ]),
-    );
-  }
+    ),
+  );
+}
 
   // ── Header ────────────────────────────────────────────────────────────────
   Widget _buildHeader() => Container(

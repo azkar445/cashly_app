@@ -29,7 +29,6 @@ class _ProfileScreenState extends State<ProfileScreen>
   String  _name     = "User";
   String  _email    = "-";
   String? _photoUrl;
-  String  _userId   = '';
 
   late AnimationController _ctrl;
   late Animation<double>   _fade;
@@ -58,7 +57,6 @@ class _ProfileScreenState extends State<ProfileScreen>
         _name     = u["name"]           ?? "User";
         _email    = u["email"]          ?? "-";
         _photoUrl = u["photo"];
-        _userId   = u["id"]?.toString() ?? '';
       });
     }
   }
