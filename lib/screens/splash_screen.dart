@@ -143,13 +143,13 @@ class _SplashScreenState extends State<SplashScreen>
           child: Stack(children: [
             // Glow orbs dekoratif
             Positioned(top: -60, right: -40,
-                child: _glow(220, const Color(0xFF2563EB).withOpacity(0.18))),
+                child: _glow(220, const Color(0xFF2563EB).withValues(alpha: 0.18))),
             Positioned(top: 100, left: -30,
-                child: _glow(140, const Color(0xFF60A5FA).withOpacity(0.12))),
+                child: _glow(140, const Color(0xFF60A5FA).withValues(alpha: 0.12))),
             Positioned(bottom: 80, right: 20,
-                child: _glow(100, const Color(0xFF38BDF8).withOpacity(0.10))),
+                child: _glow(100, const Color(0xFF38BDF8).withValues(alpha: 0.10))),
             Positioned(bottom: -40, left: -20,
-                child: _glow(160, const Color(0xFF1540A8).withOpacity(0.20))),
+                child: _glow(160, const Color(0xFF1540A8).withValues(alpha: 0.20))),
 
             // Grid pattern
             CustomPaint(
@@ -217,7 +217,7 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Text(
                       "Kelola keuanganmu dengan cerdas",
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.55),
+                        color: Colors.white.withValues(alpha: 0.55),
                         fontSize: 14,
                         letterSpacing: 0.3,
                       ),
@@ -246,12 +246,12 @@ class _SplashScreenState extends State<SplashScreen>
     return Container(
       width: 90, height: 90,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.12),
+        color: Colors.white.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: Colors.white.withOpacity(0.20), width: 1.5),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.20), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2563EB).withOpacity(0.50),
+            color: const Color(0xFF2563EB).withValues(alpha: 0.50),
             blurRadius: 40,
             spreadRadius: 4,
             offset: const Offset(0, 10),
@@ -344,7 +344,9 @@ class _LoadingDotsState extends State<_LoadingDots>
 
   @override
   void dispose() {
-    for (final c in _ctrls) c.dispose();
+    for (final c in _ctrls) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -358,7 +360,7 @@ class _LoadingDotsState extends State<_LoadingDots>
           margin: const EdgeInsets.symmetric(horizontal: 4),
           width: 6, height: 6,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.30 + _anims[i].value * 0.70),
+            color: Colors.white.withValues(alpha: 0.30 + _anims[i].value * 0.70),
             shape: BoxShape.circle,
           ),
         ),
@@ -372,13 +374,15 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final p = Paint()
-      ..color = Colors.white.withOpacity(0.03)
+      ..color = Colors.white.withValues(alpha: 0.03)
       ..strokeWidth = 1;
     const step = 44.0;
-    for (double x = 0; x <= size.width; x += step)
+    for (double x = 0; x <= size.width; x += step) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), p);
-    for (double y = 0; y <= size.height; y += step)
+    }
+    for (double y = 0; y <= size.height; y += step) {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), p);
+    }
   }
 
   @override

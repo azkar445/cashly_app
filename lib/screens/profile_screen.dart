@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/transaction.dart';
 import '../providers/theme_provider.dart';
+import '../services/api_constants.dart';
 import '../services/local_storage_service.dart';
 import '../theme/app_colors.dart';
 import 'login_screen.dart';
@@ -87,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           children: [
             Container(
               width: 56, height: 56,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   color: StaticColors.expenseLight, shape: BoxShape.circle),
               child: const Icon(Icons.logout_rounded,
                   color: StaticColors.expenseRed, size: 26),
@@ -127,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     color: StaticColors.expenseRed,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [BoxShadow(
-                        color: StaticColors.expenseRed.withOpacity(0.35),
+                        color: StaticColors.expenseRed.withValues(alpha: 0.35),
                         blurRadius: 12, offset: const Offset(0, 4))],
                   ),
                   child: const Center(child: Text("Keluar",
@@ -243,6 +246,41 @@ class _ProfileScreenState extends State<ProfileScreen>
                     trailing: _Switch(isDark: isDark),
                     onTap: () => context.read<ThemeProvider>().toggle(),
                   ),
+                  _Tile(
+                    icon: Icons.copy_all_rounded,
+                    iconBg: const Color(0xFFE0F2FE),
+                    iconFg: const Color(0xFF0284C7),
+                    label: "Salin Ringkasan Keuangan",
+                    sub: "Ekspor saldo & ringkasan ke clipboard",
+                    onTap: () {
+                      final inc = widget.transactions.where((t) => t.isIncome).fold(0.0, (s, t) => s + t.amount);
+                      final exp = widget.transactions.where((t) => !t.isIncome).fold(0.0, (s, t) => s + t.amount);
+                      final bal = inc - exp;
+                      final f = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+                      final text = "📊 Ringkasan Finansial Cashly\n"
+                          "Nama Pengguna: $_name\n"
+                          "Sisa Saldo: ${f.format(bal)}\n"
+                          "Total Pemasukan: ${f.format(inc)}\n"
+                          "Total Pengeluaran: ${f.format(exp)}\n"
+                          "Jumlah Transaksi: ${widget.transactions.length}\n"
+                          "Dicatat di Cashly Finance App";
+                      Clipboard.setData(ClipboardData(text: text));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Row(
+                            children: [
+                              Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                              SizedBox(width: 8),
+                              Expanded(child: Text("Ringkasan keuangan berhasil disalin ke clipboard!")),
+                            ],
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          backgroundColor: StaticColors.incomeDeep,
+                        ),
+                      );
+                    },
+                  ),
                 ]),
                 const SizedBox(height: 16),
 
@@ -273,7 +311,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   child: Text(
                     "Cashly v1.0.1  ·  Made by MDC Team",
                     style: TextStyle(
-                        color: c.textMuted.withOpacity(0.7), fontSize: 11),
+                        color: c.textMuted.withValues(alpha: 0.7), fontSize: 11),
                   ),
                 ),
               ])),
@@ -300,11 +338,11 @@ class _ProfileScreenState extends State<ProfileScreen>
       ),
       child: Stack(clipBehavior: Clip.none, children: [
         Positioned(top: -40, right: -20,
-            child: _glow(170, StaticColors.headerBright.withOpacity(0.17))),
+            child: _glow(170, StaticColors.headerBright.withValues(alpha: 0.17))),
         Positioned(top: 60, right: 60,
-            child: _glow(70, StaticColors.accentCyan.withOpacity(0.10))),
+            child: _glow(70, StaticColors.accentCyan.withValues(alpha: 0.10))),
         Positioned(bottom: 0, left: -20,
-            child: _glow(110, StaticColors.glowBlue.withOpacity(0.12))),
+            child: _glow(110, StaticColors.glowBlue.withValues(alpha: 0.12))),
 
         SafeArea(bottom: false, child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
@@ -321,9 +359,9 @@ class _ProfileScreenState extends State<ProfileScreen>
               Container(
                 width: 40, height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.12),
+                  color: Colors.white.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(11),
-                  border: Border.all(color: Colors.white.withOpacity(0.15)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
                 ),
                 child: const Icon(Icons.settings_outlined,
                     color: StaticColors.white, size: 18),
@@ -347,27 +385,30 @@ class _ProfileScreenState extends State<ProfileScreen>
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      StaticColors.accentCyan.withOpacity(0.80),
+                      StaticColors.accentCyan.withValues(alpha: 0.80),
                       StaticColors.headerBright,
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   border: Border.all(
-                      color: Colors.white.withOpacity(0.30), width: 2.5),
+                      color: Colors.white.withValues(alpha: 0.30), width: 2.5),
                   boxShadow: [BoxShadow(
-                      color: StaticColors.headerBright.withOpacity(0.40),
+                      color: StaticColors.headerBright.withValues(alpha: 0.40),
                       blurRadius: 20, offset: const Offset(0, 6))],
                 ),
                 child: ClipOval(
-                  child: _photoUrl != null
-                      ? Image.network(
-                          _photoUrl!,
-                          fit: BoxFit.cover,
-                          width: 84, height: 84,
-                          errorBuilder: (_, __, ___) => _initialsWidget(),
-                        )
-                      : _initialsWidget(),
+                  child: () {
+                    final resolvedAvatar = ApiConstants.resolveAvatarUrl(_photoUrl);
+                    return resolvedAvatar != null
+                        ? Image.network(
+                            resolvedAvatar,
+                            fit: BoxFit.cover,
+                            width: 84, height: 84,
+                            errorBuilder: (_, __, ___) => _initialsWidget(),
+                          )
+                        : _initialsWidget();
+                  }(),
                 ),
               ),
             ),
@@ -386,16 +427,16 @@ class _ProfileScreenState extends State<ProfileScreen>
             // Email
             Text(_email,
                 style: TextStyle(
-                    color: Colors.white.withOpacity(0.55), fontSize: 12)),
+                    color: Colors.white.withValues(alpha: 0.55), fontSize: 12)),
             const SizedBox(height: 12),
 
             // Member badge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.12),
+                color: Colors.white.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(99),
-                border: Border.all(color: Colors.white.withOpacity(0.18)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
               ),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 Container(
@@ -458,7 +499,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: c.cardBorder),
         boxShadow: [BoxShadow(
-            color: const Color(0xFF1540A8).withOpacity(0.05),
+            color: const Color(0xFF1540A8).withValues(alpha: 0.05),
             blurRadius: 14, offset: const Offset(0, 4))],
       ),
       child: Column(children: [
@@ -508,7 +549,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: c.cardBorder),
           boxShadow: [BoxShadow(
-              color: const Color(0xFF1540A8).withOpacity(0.06),
+              color: const Color(0xFF1540A8).withValues(alpha: 0.06),
               blurRadius: 18, offset: const Offset(0, 5))],
         ),
         child: Column(
@@ -580,13 +621,13 @@ class _ProfileScreenState extends State<ProfileScreen>
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: const Color(0xFFFECACA), width: 1.5),
           boxShadow: [BoxShadow(
-              color: StaticColors.expenseRed.withOpacity(0.08),
+              color: StaticColors.expenseRed.withValues(alpha: 0.08),
               blurRadius: 14, offset: const Offset(0, 4))],
         ),
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Container(
             width: 32, height: 32,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 color: StaticColors.expenseLight, shape: BoxShape.circle),
             child: const Icon(Icons.logout_rounded,
                 size: 16, color: StaticColors.expenseRed),

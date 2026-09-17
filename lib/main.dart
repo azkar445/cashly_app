@@ -82,7 +82,7 @@ class _AppEntryState extends State<_AppEntry> {
     // Tampilkan splash dulu, setelah session dicek baru navigasi
     if (_nextScreen == null) {
       // Session belum selesai dicek — splash tetap tampil
-      return SplashScreen(nextScreen: const LoginScreen());
+      return const SplashScreen(nextScreen: LoginScreen());
     }
     return SplashScreen(nextScreen: _nextScreen!);
   }

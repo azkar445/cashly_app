@@ -144,11 +144,11 @@ class _LoginScreenState extends State<LoginScreen>
               final t = _floatAnim.value;
               return Stack(children: [
                 _orb(top: -60 + t * 30, left: -50,  size: 220,
-                    color: _C.headerBright.withOpacity(0.18)),
+                    color: _C.headerBright.withValues(alpha: 0.18)),
                 _orb(top: 80  - t * 20, right: -40, size: 170,
-                    color: _C.accentCyan.withOpacity(0.10)),
+                    color: _C.accentCyan.withValues(alpha: 0.10)),
                 _orb(top: 200 + t * 25, left: 40,   size: 100,
-                    color: _C.glowBlue.withOpacity(0.13)),
+                    color: _C.glowBlue.withValues(alpha: 0.13)),
               ]);
             },
           ),
@@ -198,11 +198,11 @@ class _LoginScreenState extends State<LoginScreen>
             Container(
               width: 72, height: 72,
               decoration: BoxDecoration(
-                color: _C.white.withOpacity(0.12),
+                color: _C.white.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: _C.white.withOpacity(0.20), width: 1.5),
+                border: Border.all(color: _C.white.withValues(alpha: 0.20), width: 1.5),
                 boxShadow: [BoxShadow(
-                    color: _C.headerBright.withOpacity(0.35),
+                    color: _C.headerBright.withValues(alpha: 0.35),
                     blurRadius: 28, offset: const Offset(0, 8))],
               ),
               child: Stack(alignment: Alignment.center, children: [
@@ -228,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen>
             ),
             const SizedBox(height: 8),
             Text("Kelola keuanganmu dengan cerdas",
-                style: TextStyle(color: _C.white.withOpacity(0.60),
+                style: TextStyle(color: _C.white.withValues(alpha: 0.60),
                     fontSize: 13, letterSpacing: 0.3)),
             const SizedBox(height: 20),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -247,9 +247,9 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _pill(IconData icon, String label) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
     decoration: BoxDecoration(
-      color: _C.white.withOpacity(0.10),
+      color: _C.white.withValues(alpha: 0.10),
       borderRadius: BorderRadius.circular(99),
-      border: Border.all(color: _C.white.withOpacity(0.15)),
+      border: Border.all(color: _C.white.withValues(alpha: 0.15)),
     ),
     child: Row(mainAxisSize: MainAxisSize.min, children: [
       Icon(icon, size: 12, color: _C.accentCyan),
@@ -272,9 +272,9 @@ class _LoginScreenState extends State<LoginScreen>
               color: _C.bgCard,
               borderRadius: BorderRadius.circular(28),
               boxShadow: [
-                BoxShadow(color: _C.headerBlue.withOpacity(0.18),
+                BoxShadow(color: _C.headerBlue.withValues(alpha: 0.18),
                     blurRadius: 40, offset: const Offset(0, 16)),
-                BoxShadow(color: Colors.black.withOpacity(0.06),
+                BoxShadow(color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 12, offset: const Offset(0, 4)),
               ],
             ),
@@ -321,10 +321,10 @@ class _LoginScreenState extends State<LoginScreen>
                 const SizedBox(height: 20),
                 Row(children: [
                   Expanded(child: Divider(color: Colors.grey.shade200)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Text("atau",
-                        style: TextStyle(color: _C.textMuted, fontSize: 12)),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: const Text("atau",
+                        style: const TextStyle(color: _C.textMuted, fontSize: 12)),
                   ),
                   Expanded(child: Divider(color: Colors.grey.shade200)),
                 ]),
@@ -405,7 +405,7 @@ class _LoginScreenState extends State<LoginScreen>
           ),
           borderRadius: BorderRadius.circular(15),
           boxShadow: [BoxShadow(
-              color: _C.headerBright.withOpacity(0.38),
+              color: _C.headerBright.withValues(alpha: 0.38),
               blurRadius: 18, offset: const Offset(0, 7))],
         ),
         child: Center(
@@ -426,21 +426,35 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _googleBtn() => Container(
-    height: 50,
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: _C.inputBorder, width: 1.5),
+  Future<void> _loginDemo() async {
+    setState(() => _isLoading = true);
+    await AuthService.loginAsGuest();
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const MainScreen()),
+        (_) => false,
+      );
+    }
+  }
+
+  Widget _googleBtn() => GestureDetector(
+    onTap: _isLoading ? null : _loginDemo,
+    child: Container(
+      height: 52,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0FDF4),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF86EFAC), width: 1.2),
+      ),
+      child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Icon(Icons.flash_on_rounded, color: Color(0xFF16A34A), size: 20),
+        SizedBox(width: 8),
+        Text("Coba Mode Tamu / Demo",
+            style: TextStyle(color: Color(0xFF16A34A), fontSize: 14,
+                fontWeight: FontWeight.w700)),
+      ]),
     ),
-    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-      SizedBox(width: 22, height: 22,
-          child: CustomPaint(painter: _GoogleGPainter())),
-      const SizedBox(width: 10),
-      const Text("Masuk dengan Google",
-          style: TextStyle(color: _C.textPrimary, fontSize: 14,
-              fontWeight: FontWeight.w600)),
-    ]),
   );
 
   Widget _buildSignUp() {
@@ -465,12 +479,14 @@ class _LoginScreenState extends State<LoginScreen>
 class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = Colors.white.withOpacity(0.04)..strokeWidth = 1;
+    final p = Paint()..color = Colors.white.withValues(alpha: 0.04)..strokeWidth = 1;
     const step = 40.0;
-    for (double x = 0; x <= size.width; x += step)
+    for (double x = 0; x <= size.width; x += step) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), p);
-    for (double y = 0; y <= size.height; y += step)
+    }
+    for (double y = 0; y <= size.height; y += step) {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), p);
+    }
   }
   @override bool shouldRepaint(_) => false;
 }

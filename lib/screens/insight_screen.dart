@@ -19,7 +19,13 @@ _CatStyle _catOf(String cat)=>_catMap[cat]??const _CatStyle(Color(0xFFF1F5F9),Co
 
 class InsightScreen extends StatelessWidget {
   final List<TransactionModel> transactions;
-  const InsightScreen({super.key,required this.transactions});
+  final Future<void> Function()? onRefresh;
+
+  const InsightScreen({
+    super.key,
+    required this.transactions,
+    this.onRefresh,
+  });
 
   String _rp(double v)=>NumberFormat.currency(locale:'id_ID',symbol:'Rp ',decimalDigits:0).format(v);
   double get _income =>transactions.where((t)=>t.isIncome).fold(0,(s,t)=>s+t.amount);
@@ -45,19 +51,28 @@ class InsightScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor:c.bgPage,
-      body:CustomScrollView(slivers:[
-        SliverToBoxAdapter(child:_buildHeader()),
-        SliverPadding(
-          padding:EdgeInsets.fromLTRB(20,24,20,bottom+16),
-          sliver:SliverList(delegate:SliverChildListDelegate([
+      body:RefreshIndicator(
+        onRefresh: onRefresh ?? () async {},
+        color: StaticColors.headerBright,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          slivers:[
+            SliverToBoxAdapter(child:_buildHeader()),
+            SliverPadding(
+              padding:EdgeInsets.fromLTRB(20,24,20,bottom+16),
+              sliver:SliverList(delegate:SliverChildListDelegate([
 
-            // 🔥 Financial Score Card
-            _buildScoreCard(context, score),
-            const SizedBox(height:20),
+                // 🔥 Financial Score Card
+                _buildScoreCard(context, score),
+                const SizedBox(height:20),
 
-            _buildBalanceCard(context),
-            const SizedBox(height:20),
-            _buildKpiRow(context,topCat,topAmt,ratio.toDouble()),
+                // 🔥 Aturan Finansial 50/30/20
+                _buildRule503020Card(context),
+                const SizedBox(height:20),
+
+                _buildBalanceCard(context),
+                const SizedBox(height:20),
+                _buildKpiRow(context,topCat,topAmt,ratio.toDouble()),
             const SizedBox(height:28),
             _sectionTitle(context,"Pengeluaran per Kategori"),
             const SizedBox(height:14),
@@ -77,14 +92,14 @@ class InsightScreen extends StatelessWidget {
       colors:[StaticColors.headerDeep,StaticColors.headerNavy,StaticColors.headerBlue],stops:[0.0,0.45,1.0],
     )),
     child:Stack(clipBehavior:Clip.none,children:[
-      Positioned(top:-30,right:-15,child:_glow(130,StaticColors.headerBright.withOpacity(0.17))),
-      Positioned(bottom:-10,left:-10,child:_glow(90,StaticColors.glowBlue.withOpacity(0.11))),
+      Positioned(top:-30,right:-15,child:_glow(130,StaticColors.headerBright.withValues(alpha: 0.17))),
+      Positioned(bottom:-10,left:-10,child:_glow(90,StaticColors.glowBlue.withValues(alpha: 0.11))),
       SafeArea(bottom:false,child:Padding(
         padding:const EdgeInsets.fromLTRB(24,20,24,28),
         child:Row(children:[
           Container(width:40,height:40,
-            decoration:BoxDecoration(color:Colors.white.withOpacity(0.12),borderRadius:BorderRadius.circular(12),
-                border:Border.all(color:Colors.white.withOpacity(0.15))),
+            decoration:BoxDecoration(color:Colors.white.withValues(alpha: 0.12),borderRadius:BorderRadius.circular(12),
+                border:Border.all(color:Colors.white.withValues(alpha: 0.15))),
             child:const Icon(Icons.insights_rounded,color:StaticColors.white,size:20),
           ),
           const SizedBox(width:14),
@@ -124,7 +139,7 @@ class InsightScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: c.cardBorder),
         boxShadow: [BoxShadow(
-            color: const Color(0xFF1540A8).withOpacity(0.07),
+            color: const Color(0xFF1540A8).withValues(alpha: 0.07),
             blurRadius: 20, offset: const Offset(0, 6))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -219,7 +234,7 @@ class InsightScreen extends StatelessWidget {
         child: LinearProgressIndicator(
           value: pct, minHeight: 6,
           color: color,
-          backgroundColor: color.withOpacity(0.12),
+          backgroundColor: color.withValues(alpha: 0.12),
         ),
       )),
       const SizedBox(width: 6),
@@ -227,6 +242,118 @@ class InsightScreen extends StatelessWidget {
           style: TextStyle(color: c.textSecondary, fontSize: 10,
               fontWeight: FontWeight.w700)),
     ]);
+  }
+
+  // ── 50/30/20 Rule Card ──────────────────────────────────────────────────
+  Widget _buildRule503020Card(BuildContext context) {
+    final c = context.colors;
+    final totalIncome = _income > 0 ? _income : (_expense > 0 ? _expense : 1.0);
+
+    // Kebutuhan (Needs) 50%
+    const needsCats = {'Makanan', 'Transport', 'Rumah', 'Kesehatan', 'Pendidikan'};
+    final needsSpent = transactions
+        .where((t) => !t.isIncome && needsCats.contains(t.category))
+        .fold(0.0, (s, t) => s + t.amount);
+
+    // Keinginan (Wants) 30%
+    const wantsCats = {'Hiburan', 'Belanja', 'Lainnya'};
+    final wantsSpent = transactions
+        .where((t) => !t.isIncome && wantsCats.contains(t.category))
+        .fold(0.0, (s, t) => s + t.amount);
+
+    // Tabungan (Savings) 20%
+    final savings = (_income - _expense).clamp(0.0, double.infinity);
+
+    final needsPct = (needsSpent / totalIncome).clamp(0.0, 1.0);
+    final wantsPct = (wantsSpent / totalIncome).clamp(0.0, 1.0);
+    final savingsPct = (savings / totalIncome).clamp(0.0, 1.0);
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: c.bgCard,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: c.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF1540A8).withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 3, height: 16,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF7C3AED),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Alokasi Budget 50/30/20",
+                    style: TextStyle(color: c.textPrimary, fontSize: 15, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3E8FF),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text(
+                  "Fintech Rule",
+                  style: TextStyle(color: Color(0xFF7C3AED), fontSize: 10, fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _ruleRow(c, "Kebutuhan (Target 50%)", needsSpent, needsPct, const Color(0xFF2563EB), const Color(0xFFEFF6FF)),
+          const SizedBox(height: 12),
+          _ruleRow(c, "Keinginan (Target 30%)", wantsSpent, wantsPct, const Color(0xFFF59E0B), const Color(0xFFFEF3C7)),
+          const SizedBox(height: 12),
+          _ruleRow(c, "Tabungan (Target 20%)", savings, savingsPct, StaticColors.incomeGreen, StaticColors.incomeLight),
+        ],
+      ),
+    );
+  }
+
+  Widget _ruleRow(DynamicColors c, String label, double amount, double pct, Color color, Color bg) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: TextStyle(color: c.textSecondary, fontSize: 12, fontWeight: FontWeight.w600)),
+            Text(
+              "${_rp(amount)} (${(pct * 100).toStringAsFixed(0)}%)",
+              style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(99),
+          child: LinearProgressIndicator(
+            value: pct,
+            minHeight: 6,
+            color: color,
+            backgroundColor: bg,
+          ),
+        ),
+      ],
+    );
   }
 
   // ── Balance card ──────────────────────────────────────────────────────────
@@ -237,16 +364,16 @@ class InsightScreen extends StatelessWidget {
       decoration:BoxDecoration(
         gradient:const LinearGradient(colors:[StaticColors.headerNavy,StaticColors.headerBlue]),
         borderRadius:BorderRadius.circular(20),
-        boxShadow:[BoxShadow(color:StaticColors.headerBlue.withOpacity(0.30),blurRadius:24,offset:const Offset(0,8))],
+        boxShadow:[BoxShadow(color:StaticColors.headerBlue.withValues(alpha: 0.30),blurRadius:24,offset:const Offset(0,8))],
       ),
       child:Column(children:[
         Row(children:[
           Expanded(child:_balRow("Pemasukan",_income,true)),
-          Container(width:1,height:40,color:Colors.white.withOpacity(0.15)),
+          Container(width:1,height:40,color:Colors.white.withValues(alpha: 0.15)),
           Expanded(child:_balRow("Pengeluaran",_expense,false)),
         ]),
         Padding(padding:const EdgeInsets.symmetric(vertical:16),
-            child:Divider(color:Colors.white.withOpacity(0.12),thickness:1)),
+            child:Divider(color:Colors.white.withValues(alpha: 0.12),thickness:1)),
         Row(mainAxisAlignment:MainAxisAlignment.spaceBetween,children:[
           const Text("Saldo Bersih",style:TextStyle(color:StaticColors.white70,fontSize:13,fontWeight:FontWeight.w500)),
           Text(_rp(_income-_expense),style:TextStyle(
@@ -259,7 +386,7 @@ class InsightScreen extends StatelessWidget {
 
   Widget _balRow(String label,double val,bool isIncome) {
     final color=isIncome?StaticColors.incomeGreen:StaticColors.expenseRed;
-    final bg=isIncome?StaticColors.incomeGreen.withOpacity(0.15):StaticColors.expenseRed.withOpacity(0.15);
+    final bg=isIncome?StaticColors.incomeGreen.withValues(alpha: 0.15):StaticColors.expenseRed.withValues(alpha: 0.15);
     final icon=isIncome?Icons.arrow_downward_rounded:Icons.arrow_upward_rounded;
     return Expanded(child:Column(children:[
       Container(width:32,height:32,decoration:BoxDecoration(color:bg,shape:BoxShape.circle),child:Icon(icon,color:color,size:16)),
@@ -292,7 +419,7 @@ class InsightScreen extends StatelessWidget {
       padding:const EdgeInsets.all(16),
       decoration:BoxDecoration(color:c.bgCard,borderRadius:BorderRadius.circular(18),
         border:Border.all(color:c.cardBorder),
-        boxShadow:[BoxShadow(color:const Color(0xFF1540A8).withOpacity(0.07),blurRadius:18,offset:const Offset(0,6))],
+        boxShadow:[BoxShadow(color:const Color(0xFF1540A8).withValues(alpha: 0.07),blurRadius:18,offset:const Offset(0,6))],
       ),
       child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
         Row(children:[
@@ -329,7 +456,7 @@ class InsightScreen extends StatelessWidget {
       padding:const EdgeInsets.all(16),
       decoration:BoxDecoration(color:c.bgCard,borderRadius:BorderRadius.circular(18),
         border:Border.all(color:c.cardBorder),
-        boxShadow:[BoxShadow(color:const Color(0xFF1540A8).withOpacity(0.06),blurRadius:16,offset:const Offset(0,5))],
+        boxShadow:[BoxShadow(color:const Color(0xFF1540A8).withValues(alpha: 0.06),blurRadius:16,offset:const Offset(0,5))],
       ),
       child:Row(children:[
         Container(width:46,height:46,decoration:BoxDecoration(color:style.bg,borderRadius:BorderRadius.circular(13)),
@@ -384,7 +511,7 @@ class _ScoreRingPainter extends CustomPainter {
     final cx     = size.width / 2;
     final cy     = size.height / 2;
     final radius = size.width / 2 - 8;
-    final stroke = 10.0;
+    const stroke = 10.0;
 
     // Background ring
     canvas.drawArc(

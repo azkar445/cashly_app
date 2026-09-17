@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../services/local_storage_service.dart';
+import '../services/api_constants.dart';
 import '../theme/app_colors.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -97,7 +98,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     try {
       final res = await http.post(
-        Uri.parse("http://10.0.2.2/keuangan_api/config/update_password.php"),
+        Uri.parse(ApiConstants.updatePasswordUrl),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "user_id"     : int.tryParse(_userId) ?? 0,
@@ -108,11 +109,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
       final data = jsonDecode(res.body);
 
-      if (data['status'] == 'success') {
+      if (data['status'] == true || data['status'] == 'success') {
         _snack("Password berhasil diubah ✓");
         if (mounted) Navigator.pop(context, true);
       } else {
-        _snack(data['msg'] ?? "Gagal mengubah password", isError: true);
+        _snack(data['message'] ?? data['msg'] ?? "Gagal mengubah password", isError: true);
       }
     } catch (e) {
       _snack("Gagal terhubung ke server", isError: true);
@@ -207,9 +208,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           child: Container(
             width: 38, height: 38,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
+              color: Colors.white.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.white.withOpacity(0.15)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
             ),
             child: const Icon(Icons.arrow_back_ios_new_rounded,
                 color: StaticColors.white, size: 16),
@@ -229,13 +230,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFEFF6FF),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: StaticColors.headerBright.withOpacity(0.20)),
+        border: Border.all(color: StaticColors.headerBright.withValues(alpha: 0.20)),
       ),
       child: Row(children: [
         Container(
           width: 36, height: 36,
           decoration: BoxDecoration(
-              color: StaticColors.headerBright.withOpacity(0.12),
+              color: StaticColors.headerBright.withValues(alpha: 0.12),
               shape: BoxShape.circle),
           child: const Icon(Icons.shield_outlined,
               color: StaticColors.headerBright, size: 18),
@@ -359,7 +360,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ),
           borderRadius: BorderRadius.circular(15),
           boxShadow: [BoxShadow(
-              color: StaticColors.headerBright.withOpacity(0.38),
+              color: StaticColors.headerBright.withValues(alpha: 0.38),
               blurRadius: 18, offset: const Offset(0, 7))],
         ),
         child: Center(child: _isLoading

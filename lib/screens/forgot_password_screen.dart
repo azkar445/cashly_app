@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../services/api_constants.dart';
 import '../theme/app_colors.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -67,7 +68,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     setState(() => _isLoading = true);
     try {
       final res = await http.post(
-        Uri.parse("http://10.0.2.2/keuangan_api/config/forgot_password.php"),
+        Uri.parse(ApiConstants.forgotPasswordUrl),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"action": "check_email", "email": email}),
       );
@@ -109,7 +110,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     setState(() => _isLoading = true);
     try {
       final res = await http.post(
-        Uri.parse("http://10.0.2.2/keuangan_api/config/forgot_password.php"),
+        Uri.parse(ApiConstants.forgotPasswordUrl),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "action"      : "reset_password",
@@ -213,9 +214,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           child: Container(
             width: 38, height: 38,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
+              color: Colors.white.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.white.withOpacity(0.15)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
             ),
             child: const Icon(Icons.arrow_back_ios_new_rounded,
                 color: StaticColors.white, size: 16),
@@ -245,7 +246,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
             decoration: BoxDecoration(
               color: i + 1 <= _step
                   ? Colors.white
-                  : Colors.white.withOpacity(0.30),
+                  : Colors.white.withValues(alpha: 0.30),
               borderRadius: BorderRadius.circular(99),
             ),
           ))),
@@ -263,7 +264,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         decoration: BoxDecoration(
           color: const Color(0xFFEFF6FF),
           shape: BoxShape.circle,
-          border: Border.all(color: StaticColors.headerBright.withOpacity(0.20)),
+          border: Border.all(color: StaticColors.headerBright.withValues(alpha: 0.20)),
         ),
         child: const Icon(Icons.mail_outline_rounded,
             size: 36, color: StaticColors.headerBright),
@@ -322,7 +323,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         decoration: BoxDecoration(
           color: StaticColors.incomeLight,
           shape: BoxShape.circle,
-          border: Border.all(color: StaticColors.incomeGreen.withOpacity(0.30)),
+          border: Border.all(color: StaticColors.incomeGreen.withValues(alpha: 0.30)),
         ),
         child: const Icon(Icons.lock_reset_rounded,
             size: 36, color: StaticColors.incomeDeep),
@@ -384,7 +385,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
             child: LinearProgressIndicator(
               value: _strength, minHeight: 5,
               color: _strengthColor,
-              backgroundColor: _strengthColor.withOpacity(0.15),
+              backgroundColor: _strengthColor.withValues(alpha: 0.15),
             ),
           )),
           const SizedBox(width: 10),
@@ -467,7 +468,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           color: StaticColors.incomeLight,
           shape: BoxShape.circle,
           boxShadow: [BoxShadow(
-              color: StaticColors.incomeGreen.withOpacity(0.25),
+              color: StaticColors.incomeGreen.withValues(alpha: 0.25),
               blurRadius: 24, offset: const Offset(0, 8))],
         ),
         child: const Icon(Icons.check_circle_rounded,
@@ -498,7 +499,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
             ),
             borderRadius: BorderRadius.circular(15),
             boxShadow: [BoxShadow(
-                color: StaticColors.headerBright.withOpacity(0.38),
+                color: StaticColors.headerBright.withValues(alpha: 0.38),
                 blurRadius: 18, offset: const Offset(0, 7))],
           ),
           child: const Center(child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -528,7 +529,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           ),
           borderRadius: BorderRadius.circular(15),
           boxShadow: [BoxShadow(
-              color: StaticColors.headerBright.withOpacity(0.38),
+              color: StaticColors.headerBright.withValues(alpha: 0.38),
               blurRadius: 18, offset: const Offset(0, 7))],
         ),
         child: Center(child: _isLoading

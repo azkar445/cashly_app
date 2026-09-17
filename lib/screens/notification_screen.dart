@@ -112,14 +112,14 @@ class NotificationScreen extends StatelessWidget {
         colors:[StaticColors.headerDeep,StaticColors.headerNavy,StaticColors.headerBlue],stops:[0.0,0.45,1.0],
       )),
       child:Stack(clipBehavior:Clip.none,children:[
-        Positioned(top:-30,right:-15,child:_glow(130,StaticColors.headerBright.withOpacity(0.17))),
+        Positioned(top:-30,right:-15,child:_glow(130,StaticColors.headerBright.withValues(alpha: 0.17))),
         SafeArea(bottom:false,child:Padding(
           padding:const EdgeInsets.fromLTRB(20,16,20,24),
           child:Row(children:[
             GestureDetector(onTap:()=>Navigator.pop(context),
               child:Container(width:38,height:38,
-                decoration:BoxDecoration(color:Colors.white.withOpacity(0.12),borderRadius:BorderRadius.circular(10),
-                    border:Border.all(color:Colors.white.withOpacity(0.15))),
+                decoration:BoxDecoration(color:Colors.white.withValues(alpha: 0.12),borderRadius:BorderRadius.circular(10),
+                    border:Border.all(color:Colors.white.withValues(alpha: 0.15))),
                 child:const Icon(Icons.arrow_back_ios_new_rounded,color:StaticColors.white,size:16),
               ),
             ),
@@ -131,7 +131,7 @@ class NotificationScreen extends StatelessWidget {
             if (count>0) Container(
               padding:const EdgeInsets.symmetric(horizontal:11,vertical:5),
               decoration:BoxDecoration(color:StaticColors.expenseRed,borderRadius:BorderRadius.circular(99),
-                  boxShadow:[BoxShadow(color:StaticColors.expenseRed.withOpacity(0.40),blurRadius:8,offset:const Offset(0,2))]),
+                  boxShadow:[BoxShadow(color:StaticColors.expenseRed.withValues(alpha: 0.40),blurRadius:8,offset:const Offset(0,2))]),
               child:Text("$count baru",style:const TextStyle(color:StaticColors.white,fontSize:11,fontWeight:FontWeight.w700)),
             ),
           ]),
@@ -158,9 +158,9 @@ class NotificationScreen extends StatelessWidget {
     return Container(
       padding:const EdgeInsets.all(14),
       decoration:BoxDecoration(color:c.bgCard,borderRadius:BorderRadius.circular(16),
-        border:Border.all(color:n.isWarning?const Color(0xFFB45309).withOpacity(0.30):c.cardBorder,
+        border:Border.all(color:n.isWarning?const Color(0xFFB45309).withValues(alpha: 0.30):c.cardBorder,
             width:n.isWarning?1.5:1),
-        boxShadow:[BoxShadow(color:const Color(0xFF1540A8).withOpacity(0.06),blurRadius:16,offset:const Offset(0,4))],
+        boxShadow:[BoxShadow(color:const Color(0xFF1540A8).withValues(alpha: 0.06),blurRadius:16,offset:const Offset(0,4))],
       ),
       child:Row(crossAxisAlignment:CrossAxisAlignment.start,children:[
         Container(width:44,height:44,decoration:BoxDecoration(color:n.iconBg,borderRadius:BorderRadius.circular(12)),

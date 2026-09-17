@@ -124,7 +124,7 @@ class _HelpScreenState extends State<HelpScreen> {
               child: Row(children: [
                 Container(width: 40, height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(11),
                   ),
                   child: const Icon(Icons.help_outline_rounded,
@@ -175,7 +175,7 @@ class _HelpScreenState extends State<HelpScreen> {
     )),
     child: Stack(clipBehavior: Clip.none, children: [
       Positioned(top: -30, right: -15,
-          child: _glow(120, StaticColors.headerBright.withOpacity(0.17))),
+          child: _glow(120, StaticColors.headerBright.withValues(alpha: 0.17))),
       SafeArea(bottom: false, child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         child: Row(children: [
@@ -184,9 +184,9 @@ class _HelpScreenState extends State<HelpScreen> {
             child: Container(
               width: 38, height: 38,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.12),
+                color: Colors.white.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.white.withOpacity(0.15)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
               ),
               child: const Icon(Icons.arrow_back_ios_new_rounded,
                   color: StaticColors.white, size: 16),
@@ -234,7 +234,7 @@ class _HelpScreenState extends State<HelpScreen> {
         color: c.bgCard, borderRadius: BorderRadius.circular(20),
         border: Border.all(color: c.cardBorder),
         boxShadow: [BoxShadow(
-            color: const Color(0xFF1540A8).withOpacity(0.06),
+            color: const Color(0xFF1540A8).withValues(alpha: 0.06),
             blurRadius: 16, offset: const Offset(0, 5))],
       ),
       child: Column(children: List.generate(faq.items.length, (i) {
@@ -329,12 +329,12 @@ class _HelpScreenState extends State<HelpScreen> {
             color: const Color(0xFFEFF6FF),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Row(children: [
-            const Icon(Icons.smart_toy_rounded,
+          child: const Row(children: [
+            Icon(Icons.smart_toy_rounded,
                 color: StaticColors.headerBright, size: 20),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Text("Buka tab AI untuk bertanya langsung",
-                style: const TextStyle(color: StaticColors.headerBright,
+                style: TextStyle(color: StaticColors.headerBright,
                     fontSize: 13, fontWeight: FontWeight.w600)),
           ]),
         ),

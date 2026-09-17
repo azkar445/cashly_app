@@ -26,16 +26,16 @@ class AboutScreen extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [BoxShadow(
-                    color: StaticColors.headerBlue.withOpacity(0.28),
+                    color: StaticColors.headerBlue.withValues(alpha: 0.28),
                     blurRadius: 24, offset: const Offset(0, 8))],
               ),
               child: Column(children: [
                 Container(
                   width: 72, height: 72,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.25)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
                   ),
                   child: const Icon(Icons.monetization_on_rounded,
                       color: Colors.white, size: 36),
@@ -51,15 +51,15 @@ class AboutScreen extends StatelessWidget {
                 ])),
                 const SizedBox(height: 6),
                 Text("Kelola keuanganmu dengan cerdas",
-                    style: TextStyle(color: Colors.white.withOpacity(0.60),
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.60),
                         fontSize: 13)),
                 const SizedBox(height: 14),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.12),
+                    color: Colors.white.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(99),
-                    border: Border.all(color: Colors.white.withOpacity(0.18)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
                   ),
                   child: const Text("Versi 1.0.1",
                       style: TextStyle(color: Colors.white, fontSize: 12,
@@ -79,10 +79,10 @@ class AboutScreen extends StatelessWidget {
             _sectionTitle(context, "Informasi Aplikasi"),
             const SizedBox(height: 12),
             _infoCard(context, [
-              _InfoRow(Icons.code_rounded, "Versi App",       "1.0.1 (Build 1)"),
-              _InfoRow(Icons.phone_android_rounded, "Platform", "Android"),
-              _InfoRow(Icons.storage_rounded, "Database",     "MySQL via PHP API"),
-              _InfoRow(Icons.palette_rounded, "Framework",    "Flutter 3.x"),
+              const _InfoRow(Icons.code_rounded, "Versi App",       "1.0.1 (Build 1)"),
+              const _InfoRow(Icons.phone_android_rounded, "Platform", "Android"),
+              const _InfoRow(Icons.storage_rounded, "Database",     "MySQL via PHP API"),
+              const _InfoRow(Icons.palette_rounded, "Framework",    "Flutter 3.x"),
             ]),
             const SizedBox(height: 28),
 
@@ -95,7 +95,7 @@ class AboutScreen extends StatelessWidget {
                 color: c.bgCard, borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: c.cardBorder),
                 boxShadow: [BoxShadow(
-                    color: const Color(0xFF1540A8).withOpacity(0.06),
+                    color: const Color(0xFF1540A8).withValues(alpha: 0.06),
                     blurRadius: 16, offset: const Offset(0, 5))],
               ),
               child: Row(children: [
@@ -134,18 +134,18 @@ class AboutScreen extends StatelessWidget {
             _sectionTitle(context, "Legal"),
             const SizedBox(height: 12),
             _infoCard(context, [
-              _InfoRow(Icons.gavel_rounded,         "Lisensi",          "MIT License"),
-              _InfoRow(Icons.privacy_tip_outlined,  "Kebijakan Privasi","Data disimpan lokal & server"),
-              _InfoRow(Icons.copyright_rounded,     "Copyright",        "© 2026 Cashly"),
+              const _InfoRow(Icons.gavel_rounded,         "Lisensi",          "MIT License"),
+              const _InfoRow(Icons.privacy_tip_outlined,  "Kebijakan Privasi","Data disimpan lokal & server"),
+              const _InfoRow(Icons.copyright_rounded,     "Copyright",        "© 2026 Cashly"),
             ]),
             const SizedBox(height: 28),
 
             // Footer
             Text("Made by MDC Team  ·  2026",
-                style: TextStyle(color: c.textMuted.withOpacity(0.6), fontSize: 12)),
+                style: TextStyle(color: c.textMuted.withValues(alpha: 0.6), fontSize: 12)),
             const SizedBox(height: 4),
             Text("Cashly v1.0.1",
-                style: TextStyle(color: c.textMuted.withOpacity(0.4), fontSize: 11)),
+                style: TextStyle(color: c.textMuted.withValues(alpha: 0.4), fontSize: 11)),
           ]),
         )),
       ]),
@@ -160,7 +160,7 @@ class AboutScreen extends StatelessWidget {
     )),
     child: Stack(clipBehavior: Clip.none, children: [
       Positioned(top: -30, right: -15,
-          child: _glow(120, StaticColors.headerBright.withOpacity(0.17))),
+          child: _glow(120, StaticColors.headerBright.withValues(alpha: 0.17))),
       SafeArea(bottom: false, child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         child: Row(children: [
@@ -169,9 +169,9 @@ class AboutScreen extends StatelessWidget {
             child: Container(
               width: 38, height: 38,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.12),
+                color: Colors.white.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.white.withOpacity(0.15)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
               ),
               child: const Icon(Icons.arrow_back_ios_new_rounded,
                   color: StaticColors.white, size: 16),
@@ -249,7 +249,7 @@ class AboutScreen extends StatelessWidget {
         color: c.bgCard, borderRadius: BorderRadius.circular(20),
         border: Border.all(color: c.cardBorder),
         boxShadow: [BoxShadow(
-            color: const Color(0xFF1540A8).withOpacity(0.06),
+            color: const Color(0xFF1540A8).withValues(alpha: 0.06),
             blurRadius: 16, offset: const Offset(0, 5))],
       ),
       child: Column(children: List.generate(rows.length, (i) {

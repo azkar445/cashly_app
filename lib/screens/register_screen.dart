@@ -113,7 +113,6 @@ class _RegisterScreenState extends State<RegisterScreen>
         final loginResult = await AuthService.login(email, pass);
 
         if (loginResult["status"] == true) {
-          await LocalStorageService.saveUser(loginResult["user"]);
           if (mounted) {
             Navigator.pushAndRemoveUntil(
               context,
@@ -122,16 +121,17 @@ class _RegisterScreenState extends State<RegisterScreen>
             );
           }
         } else {
-          _snack(loginResult["message"] ?? "Login gagal", isError: true);
+          _snack("Registrasi berhasil! Silakan login.", isError: false);
+          if (mounted) Navigator.pop(context);
         }
       } else {
         _snack(result["message"] ?? "Registrasi gagal", isError: true);
       }
     } catch (_) {
-      _snack("Terjadi kesalahan koneksi", isError: true);
+      _snack("Gagal terhubung ke server", isError: true);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-
-    if (mounted) setState(() => _isLoading = false);
   }
 
   void _snack(String msg, {bool isError = false}) {
@@ -170,11 +170,11 @@ class _RegisterScreenState extends State<RegisterScreen>
               final t = _floatAnim.value;
               return Stack(children: [
                 _orb(top: -50 + t * 28, right: -40, size: 200,
-                    color: _C.headerBright.withOpacity(0.17)),
+                    color: _C.headerBright.withValues(alpha: 0.17)),
                 _orb(top: 100 - t * 18, left: -30, size: 150,
-                    color: _C.accentCyan.withOpacity(0.10)),
+                    color: _C.accentCyan.withValues(alpha: 0.10)),
                 _orb(top: 220 + t * 22, right: 50, size: 90,
-                    color: _C.glowBlue.withOpacity(0.12)),
+                    color: _C.glowBlue.withValues(alpha: 0.12)),
               ]);
             },
           ),
@@ -231,13 +231,13 @@ class _RegisterScreenState extends State<RegisterScreen>
             Container(
               width: 64, height: 64,
               decoration: BoxDecoration(
-                color: _C.white.withOpacity(0.12),
+                color: _C.white.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                    color: _C.white.withOpacity(0.20), width: 1.5),
+                    color: _C.white.withValues(alpha: 0.20), width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: _C.headerBright.withOpacity(0.35),
+                    color: _C.headerBright.withValues(alpha: 0.35),
                     blurRadius: 24,
                     offset: const Offset(0, 7),
                   ),
@@ -289,7 +289,7 @@ class _RegisterScreenState extends State<RegisterScreen>
             Text(
               "Buat akun baru, gratis!",
               style: TextStyle(
-                  color: _C.white.withOpacity(0.60),
+                  color: _C.white.withValues(alpha: 0.60),
                   fontSize: 13,
                   letterSpacing: 0.2),
             ),
@@ -314,12 +314,12 @@ class _RegisterScreenState extends State<RegisterScreen>
               borderRadius: BorderRadius.circular(28),
               boxShadow: [
                 BoxShadow(
-                  color: _C.headerBlue.withOpacity(0.18),
+                  color: _C.headerBlue.withValues(alpha: 0.18),
                   blurRadius: 40,
                   offset: const Offset(0, 16),
                 ),
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
+                  color: Colors.black.withValues(alpha: 0.06),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -409,10 +409,10 @@ class _RegisterScreenState extends State<RegisterScreen>
                     Container(
                       width: 18, height: 18,
                       decoration: BoxDecoration(
-                        color: _C.headerBlue.withOpacity(0.10),
+                        color: _C.headerBlue.withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(5),
                         border: Border.all(
-                            color: _C.headerBright.withOpacity(0.4)),
+                            color: _C.headerBright.withValues(alpha: 0.4)),
                       ),
                       child: const Icon(Icons.check_rounded,
                           size: 12, color: _C.headerBright),
@@ -535,7 +535,7 @@ class _RegisterScreenState extends State<RegisterScreen>
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: _C.headerBright.withOpacity(0.38),
+              color: _C.headerBright.withValues(alpha: 0.38),
               blurRadius: 18,
               offset: const Offset(0, 7),
             ),
@@ -596,7 +596,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final p = Paint()
-      ..color = Colors.white.withOpacity(0.04)
+      ..color = Colors.white.withValues(alpha: 0.04)
       ..strokeWidth = 1;
     const step = 40.0;
     for (double x = 0; x <= size.width; x += step) {

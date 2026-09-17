@@ -29,11 +29,13 @@ enum _TxFilter { all, income, expense }
 class TransactionScreen extends StatefulWidget {
   final List<TransactionModel> transactions;
   final Function(String, double, bool, String) addTx;
+  final Future<void> Function()? onRefresh;
 
   const TransactionScreen({
     super.key,
     required this.transactions,
     required this.addTx,
+    this.onRefresh,
   });
 
   @override
@@ -118,7 +120,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Container(
               width: 52, height: 52,
-              decoration: BoxDecoration(color: StaticColors.expenseLight, shape: BoxShape.circle),
+              decoration: const BoxDecoration(color: StaticColors.expenseLight, shape: BoxShape.circle),
               child: const Icon(Icons.delete_outline_rounded, color: StaticColors.expenseRed, size: 26),
             ),
             const SizedBox(height: 16),
@@ -151,7 +153,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                   height: 44,
                   decoration: BoxDecoration(
                     color: StaticColors.expenseRed, borderRadius: BorderRadius.circular(12),
-                    boxShadow: [BoxShadow(color: StaticColors.expenseRed.withOpacity(0.35),
+                    boxShadow: [BoxShadow(color: StaticColors.expenseRed.withValues(alpha: 0.35),
                         blurRadius: 10, offset: const Offset(0, 4))],
                   ),
                   child: const Center(child: Text("Hapus",
@@ -205,26 +207,30 @@ class _TransactionScreenState extends State<TransactionScreen> {
 
     return Scaffold(
       backgroundColor: c.bgPage,
-
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _buildHeader(context)),
-          SliverToBoxAdapter(child: _buildFilterBar(context)),
-          if (_showSearch)
-            SliverToBoxAdapter(child: _buildSearchBar(context)),
-          if (filtered.isEmpty)
-            SliverFillRemaining(child: _buildEmpty(context))
-          else
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 130),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (ctx, i) => _buildGroup(ctx, grouped[i]),
-                  childCount: grouped.length,
+      body: RefreshIndicator(
+        onRefresh: widget.onRefresh ?? () async {},
+        color: StaticColors.headerBright,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          slivers: [
+            SliverToBoxAdapter(child: _buildHeader(context)),
+            SliverToBoxAdapter(child: _buildFilterBar(context)),
+            if (_showSearch)
+              SliverToBoxAdapter(child: _buildSearchBar(context)),
+            if (filtered.isEmpty)
+              SliverFillRemaining(child: _buildEmpty(context))
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 130),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (ctx, i) => _buildGroup(ctx, grouped[i]),
+                    childCount: grouped.length,
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -241,9 +247,9 @@ class _TransactionScreenState extends State<TransactionScreen> {
       ),
       child: Stack(clipBehavior: Clip.none, children: [
         Positioned(top: -30, right: -20,
-            child: _glow(140, StaticColors.headerBright.withOpacity(0.17))),
+            child: _glow(140, StaticColors.headerBright.withValues(alpha: 0.17))),
         Positioned(bottom: -10, left: 0,
-            child: _glow(100, StaticColors.glowBlue.withOpacity(0.12))),
+            child: _glow(100, StaticColors.glowBlue.withValues(alpha: 0.12))),
         SafeArea(bottom: false, child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -262,10 +268,10 @@ class _TransactionScreenState extends State<TransactionScreen> {
                     width: 38, height: 38,
                     decoration: BoxDecoration(
                       color: _showSearch
-                          ? Colors.white.withOpacity(0.25)
-                          : Colors.white.withOpacity(0.12),
+                          ? Colors.white.withValues(alpha: 0.25)
+                          : Colors.white.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.white.withOpacity(0.15)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
                     ),
                     child: const Icon(Icons.search_rounded, color: StaticColors.white, size: 18),
                   ),
@@ -287,9 +293,9 @@ class _TransactionScreenState extends State<TransactionScreen> {
                   child: Container(
                     width: 38, height: 38,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.18),
+                      color: Colors.white.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.white.withOpacity(0.25)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
                     ),
                     child: const Icon(Icons.add_rounded, color: StaticColors.white, size: 20),
                   ),
@@ -312,14 +318,14 @@ class _TransactionScreenState extends State<TransactionScreen> {
       width: s, height: s, decoration: BoxDecoration(shape: BoxShape.circle, color: c));
 
   Widget _statCard(String label, double amount, bool isIncome) {
-    final pill      = isIncome ? StaticColors.incomeGreen.withOpacity(0.18) : StaticColors.expenseRed.withOpacity(0.18);
+    final pill      = isIncome ? StaticColors.incomeGreen.withValues(alpha: 0.18) : StaticColors.expenseRed.withValues(alpha: 0.18);
     final iconColor = isIncome ? StaticColors.incomeGreen : StaticColors.expenseRed;
     final icon      = isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.10), borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.12)),
+        color: Colors.white.withValues(alpha: 0.10), borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
       child: Row(children: [
         Container(width: 34, height: 34,
@@ -347,11 +353,11 @@ class _TransactionScreenState extends State<TransactionScreen> {
         scrollDirection: Axis.horizontal,
         child: Row(children: [
           // Type filters
-          _filterChip(context, "Semua",      _filter == _TxFilter.all,     () => setState(() { _filter = _TxFilter.all; _catFilter = null; })),
+          _filterChip(context, "Semua (${widget.transactions.length})",      _filter == _TxFilter.all,     () => setState(() { _filter = _TxFilter.all; _catFilter = null; })),
           const SizedBox(width: 8),
-          _filterChip(context, "Pemasukan",  _filter == _TxFilter.income,  () => setState(() { _filter = _TxFilter.income; _catFilter = null; })),
+          _filterChip(context, "Pemasukan (${widget.transactions.where((t) => t.isIncome).length})",  _filter == _TxFilter.income,  () => setState(() { _filter = _TxFilter.income; _catFilter = null; })),
           const SizedBox(width: 8),
-          _filterChip(context, "Pengeluaran",_filter == _TxFilter.expense, () => setState(() { _filter = _TxFilter.expense; _catFilter = null; })),
+          _filterChip(context, "Pengeluaran (${widget.transactions.where((t) => !t.isIncome).length})",_filter == _TxFilter.expense, () => setState(() { _filter = _TxFilter.expense; _catFilter = null; })),
           const SizedBox(width: 8),
 
           // Divider
@@ -376,7 +382,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                     color: sel ? style.fg : c.bgCard,
                     borderRadius: BorderRadius.circular(99),
                     border: Border.all(color: sel ? style.fg : c.cardBorder),
-                    boxShadow: sel ? [BoxShadow(color: style.fg.withOpacity(0.25),
+                    boxShadow: sel ? [BoxShadow(color: style.fg.withValues(alpha: 0.25),
                         blurRadius: 8, offset: const Offset(0, 2))] : [],
                   ),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -407,7 +413,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
           color: selected ? StaticColors.headerBright : c.bgCard,
           borderRadius: BorderRadius.circular(99),
           border: Border.all(color: selected ? StaticColors.headerBright : c.cardBorder),
-          boxShadow: selected ? [BoxShadow(color: StaticColors.headerBright.withOpacity(0.25),
+          boxShadow: selected ? [BoxShadow(color: StaticColors.headerBright.withValues(alpha: 0.25),
               blurRadius: 8, offset: const Offset(0, 2))] : [],
         ),
         child: Text(label, style: TextStyle(
@@ -427,8 +433,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
         decoration: BoxDecoration(
           color: c.bgCard, borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: StaticColors.headerBright.withOpacity(0.25)),
-          boxShadow: [BoxShadow(color: const Color(0xFF1540A8).withOpacity(0.07),
+          border: Border.all(color: StaticColors.headerBright.withValues(alpha: 0.25)),
+          boxShadow: [BoxShadow(color: const Color(0xFF1540A8).withValues(alpha: 0.07),
               blurRadius: 12, offset: const Offset(0, 3))],
         ),
         child: Row(children: [
@@ -475,7 +481,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
         decoration: BoxDecoration(
           color: c.bgCard, borderRadius: BorderRadius.circular(18),
           border: Border.all(color: c.cardBorder),
-          boxShadow: [BoxShadow(color: const Color(0xFF1540A8).withOpacity(0.06),
+          boxShadow: [BoxShadow(color: const Color(0xFF1540A8).withValues(alpha: 0.06),
               blurRadius: 20, offset: const Offset(0, 6))],
         ),
         child: Column(children: List.generate(group.txs.length, (i) {
@@ -509,6 +515,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
         background: _swipeBg(context, isEdit: true),
         secondaryBackground: _swipeBg(context, isEdit: false),
         child: GestureDetector(
+          onTap: () => _showActionSheet(context, tx),
           onLongPress: () => _showActionSheet(context, tx),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
@@ -564,7 +571,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         if (isEdit) ...[
-          Icon(Icons.edit_rounded, color: StaticColors.headerBright, size: 20),
+          const Icon(Icons.edit_rounded, color: StaticColors.headerBright, size: 20),
           const SizedBox(width: 6),
           const Text("Edit", style: TextStyle(color: StaticColors.headerBright,
               fontSize: 13, fontWeight: FontWeight.w700)),
@@ -578,44 +585,79 @@ class _TransactionScreenState extends State<TransactionScreen> {
     );
   }
 
-  // ── Action sheet (long press) ─────────────────────────────────────────────
+  // ── Detail & Action sheet ──────────────────────────────────────────────────
   void _showActionSheet(BuildContext context, TransactionModel tx) {
     final c = context.colors;
+    final isInc = tx.isIncome;
+    final cat = _catOf(tx.category);
+
     showModalBottomSheet(
       context: context,
       backgroundColor: c.bgCard,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
       builder: (_) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+        padding: const EdgeInsets.fromLTRB(24, 14, 24, 32),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Container(width: 40, height: 4,
               decoration: BoxDecoration(color: c.cardBorder,
                   borderRadius: BorderRadius.circular(2))),
-          const SizedBox(height: 20),
-          Text(tx.title, style: TextStyle(color: c.textPrimary, fontSize: 15,
-              fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 18),
+          Container(
+            width: 52, height: 52,
+            decoration: BoxDecoration(color: cat.bg, shape: BoxShape.circle),
+            child: Icon(cat.icon, color: cat.fg, size: 26),
+          ),
+          const SizedBox(height: 10),
+          Text(tx.title, style: TextStyle(color: c.textPrimary, fontSize: 17,
+              fontWeight: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 4),
           Text("${tx.isIncome ? '+' : '–'} ${_rp(tx.amount)}",
               style: TextStyle(
                 color: tx.isIncome ? StaticColors.incomeDeep : StaticColors.expenseDeep,
-                fontSize: 13, fontWeight: FontWeight.w600,
+                fontSize: 22, fontWeight: FontWeight.w900,
               )),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: c.bgPage, borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: c.cardBorder),
+            ),
+            child: Column(children: [
+              _detailLine(c, "Kategori", tx.category ?? "Lainnya"),
+              const SizedBox(height: 8),
+              _detailLine(c, "Tipe", isInc ? "Pemasukan" : "Pengeluaran"),
+              const SizedBox(height: 8),
+              _detailLine(c, "Waktu", DateFormat('d MMMM yyyy, HH:mm', 'id_ID').format(tx.date)),
+            ]),
+          ),
           const SizedBox(height: 20),
-          _sheetBtn(context, Icons.edit_rounded, StaticColors.headerBright,
-              const Color(0xFFEFF6FF), "Edit Transaksi", () {
-            Navigator.pop(context);
-            _editTx(tx);
-          }),
-          const SizedBox(height: 10),
-          _sheetBtn(context, Icons.delete_outline_rounded, StaticColors.expenseRed,
-              StaticColors.expenseLight, "Hapus Transaksi", () {
-            Navigator.pop(context);
-            _deleteTx(tx);
-          }),
+          Row(children: [
+            Expanded(child: _sheetBtn(context, Icons.delete_outline_rounded, StaticColors.expenseRed,
+                StaticColors.expenseLight, "Hapus", () {
+              Navigator.pop(context);
+              _deleteTx(tx);
+            })),
+            const SizedBox(width: 12),
+            Expanded(child: _sheetBtn(context, Icons.edit_rounded, StaticColors.headerBright,
+                const Color(0xFFEFF6FF), "Edit", () {
+              Navigator.pop(context);
+              _editTx(tx);
+            })),
+          ]),
         ]),
       ),
     );
   }
+
+  Widget _detailLine(DynamicColors c, String k, String v) => Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(k, style: TextStyle(color: c.textMuted, fontSize: 12)),
+      Text(v, style: TextStyle(color: c.textPrimary, fontSize: 12, fontWeight: FontWeight.w700)),
+    ],
+  );
 
   Widget _sheetBtn(BuildContext context, IconData icon, Color fg, Color bg,
       String label, VoidCallback onTap) {

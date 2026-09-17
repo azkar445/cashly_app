@@ -78,9 +78,22 @@ class _MainScreenState extends State<MainScreen>
     final navBottom  = _navBarVisualHeight + systemBottom;
 
     final pages = [
-      HomeScreen(transactions: transactions),
-      TransactionScreen(transactions: transactions, addTx: addTransaction),
-      InsightScreen(transactions: transactions),
+      HomeScreen(
+        transactions: transactions,
+        onNavigateToTx: () => _onTabTap(1),
+        onNavigateToTab: _onTabTap,
+        onRefresh: loadData,
+        addTx: addTransaction,
+      ),
+      TransactionScreen(
+        transactions: transactions,
+        addTx: addTransaction,
+        onRefresh: loadData,
+      ),
+      InsightScreen(
+        transactions: transactions,
+        onRefresh: loadData,
+      ),
       AiScreen(transactions: transactions),
       ProfileScreen(transactions: transactions),
     ];
@@ -152,12 +165,12 @@ class _FloatingNavBar extends StatelessWidget {
             borderRadius: BorderRadius.circular(40),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.10),
+                color: Colors.black.withValues(alpha: 0.10),
                 blurRadius: 30,
                 offset: const Offset(0, 8),
               ),
               BoxShadow(
-                color: StaticColors.headerBright.withOpacity(0.10),
+                color: StaticColors.headerBright.withValues(alpha: 0.10),
                 blurRadius: 20,
                 offset: const Offset(0, 4),
               ),
@@ -189,8 +202,8 @@ class _FloatingNavBar extends StatelessWidget {
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: StaticColors.headerBright.withOpacity(
-                                  isActive ? 0.55 : 0.35),
+                              color: StaticColors.headerBright.withValues(
+                                  alpha: isActive ? 0.55 : 0.35),
                               blurRadius: isActive ? 20 : 14,
                               offset: const Offset(0, 6),
                             ),

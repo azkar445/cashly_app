@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/transaction.dart';
 import '../services/financial_analytics_service.dart';
 import '../theme/app_colors.dart';
@@ -126,9 +127,9 @@ class _AiScreenState extends State<AiScreen> {
       ),
       child: Stack(clipBehavior: Clip.none, children: [
         Positioned(top: -30, right: -15,
-            child: _glow(130, StaticColors.headerBright.withOpacity(0.17))),
+            child: _glow(130, StaticColors.headerBright.withValues(alpha: 0.17))),
         Positioned(top: 20, right: 55,
-            child: _glow(55, StaticColors.accentCyan.withOpacity(0.10))),
+            child: _glow(55, StaticColors.accentCyan.withValues(alpha: 0.10))),
         SafeArea(bottom: false, child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 18, 24, 24),
           child: Row(children: [
@@ -136,16 +137,16 @@ class _AiScreenState extends State<AiScreen> {
             Container(
               width: 44, height: 44,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.12),
+                color: Colors.white.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(13),
-                border: Border.all(color: Colors.white.withOpacity(0.20)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.20)),
                 boxShadow: [BoxShadow(
-                    color: StaticColors.headerBright.withOpacity(0.30),
+                    color: StaticColors.headerBright.withValues(alpha: 0.30),
                     blurRadius: 14, offset: const Offset(0, 4))],
               ),
-              child: Center(child: SizedBox(
+              child: const Center(child: const SizedBox(
                 width: 26, height: 26,
-                child: CustomPaint(painter: _ClaudeLogo(color: Colors.white)),
+                child: const CustomPaint(painter: const _ClaudeLogo(color: Colors.white)),
               )),
             ),
             const SizedBox(width: 12),
@@ -158,9 +159,9 @@ class _AiScreenState extends State<AiScreen> {
                 ? Container(
                     padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.12),
+                      color: Colors.white.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(99),
-                      border: Border.all(color: Colors.white.withOpacity(0.15)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
                     ),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
                       Container(width: 6, height: 6,
@@ -174,9 +175,9 @@ class _AiScreenState extends State<AiScreen> {
                     child: Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.12),
+                        color: Colors.white.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.white.withOpacity(0.15)),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
                       ),
                       child: const Icon(Icons.refresh_rounded, color: StaticColors.white, size: 17),
                     ),
@@ -213,15 +214,15 @@ class _AiScreenState extends State<AiScreen> {
                 begin: Alignment.topLeft, end: Alignment.bottomRight),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [BoxShadow(
-                color: StaticColors.headerBlue.withOpacity(0.28),
+                color: StaticColors.headerBlue.withValues(alpha: 0.28),
                 blurRadius: 24, offset: const Offset(0, 8))],
           ),
           child: Row(children: [
             Container(width: 52, height: 52,
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.15),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(15)),
-              child: Center(child: SizedBox(width: 32, height: 32,
-                  child: CustomPaint(painter: _ClaudeLogo(color: Colors.white)))),
+              child: const Center(child: const SizedBox(width: 32, height: 32,
+                  child: const CustomPaint(painter: const _ClaudeLogo(color: Colors.white)))),
             ),
             const SizedBox(width: 14),
             const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -244,13 +245,13 @@ class _AiScreenState extends State<AiScreen> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: c.bgCard, borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: scoreColor.withOpacity(0.25)),
-                boxShadow: [BoxShadow(color: const Color(0xFF1540A8).withOpacity(0.05),
+                border: Border.all(color: scoreColor.withValues(alpha: 0.25)),
+                boxShadow: [BoxShadow(color: const Color(0xFF1540A8).withValues(alpha: 0.05),
                     blurRadius: 12, offset: const Offset(0, 3))],
               ),
               child: Row(children: [
                 Container(width: 52, height: 52,
-                  decoration: BoxDecoration(color: scoreColor.withOpacity(0.12),
+                  decoration: BoxDecoration(color: scoreColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(14)),
                   child: Center(child: Text("${score.total}",
                       style: TextStyle(color: scoreColor, fontSize: 20,
@@ -295,7 +296,7 @@ class _AiScreenState extends State<AiScreen> {
                 color: c.bgCard, borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: c.cardBorder),
                 boxShadow: [BoxShadow(
-                    color: const Color(0xFF1540A8).withOpacity(0.05),
+                    color: const Color(0xFF1540A8).withValues(alpha: 0.05),
                     blurRadius: 12, offset: const Offset(0, 3))],
               ),
               child: Row(children: [
@@ -353,34 +354,47 @@ class _AiScreenState extends State<AiScreen> {
                 borderRadius: BorderRadius.circular(9),
               ),
               // 🔥 Claude logo di avatar chat
-              child: Center(child: SizedBox(
+              child: const Center(child: const SizedBox(
                 width: 16, height: 16,
-                child: CustomPaint(painter: _ClaudeLogo(color: Colors.white)),
+                child: const CustomPaint(painter: const _ClaudeLogo(color: Colors.white)),
               )),
             ),
             const SizedBox(width: 8),
           ],
-          Flexible(child: Container(
-            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-            decoration: BoxDecoration(
-              gradient: isUser ? const LinearGradient(
-                  colors: [StaticColors.headerBlue, StaticColors.headerBright],
-                  begin: Alignment.topLeft, end: Alignment.bottomRight) : null,
-              color: isUser ? null : c.bgCard,
-              borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(16), topRight: const Radius.circular(16),
-                bottomLeft: Radius.circular(isUser ? 16 : 4),
-                bottomRight: Radius.circular(isUser ? 4 : 16),
+          Flexible(child: GestureDetector(
+            onLongPress: () {
+              Clipboard.setData(ClipboardData(text: msg['text']!));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text("Pesan disalin ke clipboard ✓"),
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 1),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              );
+            },
+            child: Container(
+              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.72),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+              decoration: BoxDecoration(
+                gradient: isUser ? const LinearGradient(
+                    colors: [StaticColors.headerBlue, StaticColors.headerBright],
+                    begin: Alignment.topLeft, end: Alignment.bottomRight) : null,
+                color: isUser ? null : c.bgCard,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(16), topRight: const Radius.circular(16),
+                  bottomLeft: Radius.circular(isUser ? 16 : 4),
+                  bottomRight: Radius.circular(isUser ? 4 : 16),
+                ),
+                border: isUser ? null : Border.all(color: c.cardBorder),
+                boxShadow: [BoxShadow(
+                  color: isUser ? StaticColors.headerBright.withValues(alpha: 0.25) : Colors.black.withValues(alpha: 0.04),
+                  blurRadius: isUser ? 12 : 8, offset: const Offset(0, 3),
+                )],
               ),
-              border: isUser ? null : Border.all(color: c.cardBorder),
-              boxShadow: [BoxShadow(
-                color: isUser ? StaticColors.headerBright.withOpacity(0.25) : Colors.black.withOpacity(0.04),
-                blurRadius: isUser ? 12 : 8, offset: const Offset(0, 3),
-              )],
+              child: Text(msg['text']!, style: TextStyle(
+                  fontSize: 13, color: isUser ? Colors.white : c.textPrimary, height: 1.55)),
             ),
-            child: Text(msg['text']!, style: TextStyle(
-                fontSize: 13, color: isUser ? Colors.white : c.textPrimary, height: 1.55)),
           )),
           if (isUser) ...[
             const SizedBox(width: 8),
@@ -413,9 +427,9 @@ class _AiScreenState extends State<AiScreen> {
                 begin: Alignment.topLeft, end: Alignment.bottomRight),
             borderRadius: BorderRadius.circular(9),
           ),
-          child: Center(child: SizedBox(
+          child: const Center(child: const SizedBox(
             width: 16, height: 16,
-            child: CustomPaint(painter: _ClaudeLogo(color: Colors.white)),
+            child: const CustomPaint(painter: const _ClaudeLogo(color: Colors.white)),
           )),
         ),
         const SizedBox(width: 8),
@@ -456,7 +470,7 @@ class _AiScreenState extends State<AiScreen> {
               decoration: BoxDecoration(
                 color: const Color(0xFFEFF6FF),
                 borderRadius: BorderRadius.circular(99),
-                border: Border.all(color: StaticColors.headerBright.withOpacity(0.25)),
+                border: Border.all(color: StaticColors.headerBright.withValues(alpha: 0.25)),
               ),
               child: Text(_chips[i]['label']!, style: const TextStyle(
                   color: StaticColors.headerBright, fontSize: 12, fontWeight: FontWeight.w500)),
@@ -473,7 +487,7 @@ class _AiScreenState extends State<AiScreen> {
               decoration: BoxDecoration(
                 color: c.bgInput,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: StaticColors.headerBright.withOpacity(0.20), width: 1.5),
+                border: Border.all(color: StaticColors.headerBright.withValues(alpha: 0.20), width: 1.5),
               ),
               child: TextField(
                 controller: _ctrl,
@@ -499,7 +513,7 @@ class _AiScreenState extends State<AiScreen> {
                       begin: Alignment.topLeft, end: Alignment.bottomRight),
                   shape: BoxShape.circle,
                   boxShadow: [BoxShadow(
-                      color: StaticColors.headerBright.withOpacity(0.35),
+                      color: StaticColors.headerBright.withValues(alpha: 0.35),
                       blurRadius: 12, offset: const Offset(0, 4))],
                 ),
                 child: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
@@ -528,7 +542,7 @@ class _ClaudeLogo extends CustomPainter {
 
     final cx = size.width / 2;
     final cy = size.height / 2;
-    final petalCount = 8;
+    const petalCount = 8;
     final outerR = size.width * 0.48;
     final innerR = size.width * 0.18;
     final petalW = size.width * 0.13;
@@ -587,7 +601,7 @@ class _DotState extends State<_Dot> with SingleTickerProviderStateMixin {
       margin: const EdgeInsets.symmetric(horizontal: 3),
       transform: Matrix4.translationValues(0, _a.value, 0),
       child: Container(width: 7, height: 7,
-          decoration: BoxDecoration(color: StaticColors.glowBlue.withOpacity(0.70), shape: BoxShape.circle)),
+          decoration: BoxDecoration(color: StaticColors.glowBlue.withValues(alpha: 0.70), shape: BoxShape.circle)),
     ));
   }
   @override void dispose() { _c.dispose(); super.dispose(); }

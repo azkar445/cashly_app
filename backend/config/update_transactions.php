@@ -1,12 +1,21 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
 include '../auth/database.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
+$raw = file_get_contents("php://input");
+$data = json_decode($raw, true);
 
 if (!$data || !isset($data['id']) || !isset($data['user_id'])) {
     echo json_encode(["status" => "error", "msg" => "id dan user_id diperlukan"]);
@@ -15,27 +24,35 @@ if (!$data || !isset($data['id']) || !isset($data['user_id'])) {
 
 $id        = intval($data['id']);
 $user_id   = intval($data['user_id']);
-$title     = $conn->real_escape_string($data['title']    ?? '');
-$amount    = floatval($data['amount']   ?? 0);
-$is_income = intval($data['is_income']  ?? 0);
-$category  = $conn->real_escape_string($data['category'] ?? 'Lainnya');
+$title     = trim($data['title']       ?? '');
+$amount    = floatval($data['amount']  ?? 0);
+$is_income = intval($data['is_income'] ?? 0);
+$category  = trim($data['category']    ?? 'Lainnya');
+$date      = !empty($data['date']) ? $data['date'] : null;
 
-if ($title === '' || $amount <= 0) {
+if ($id <= 0 || $user_id <= 0 || $title === '' || $amount <= 0) {
     echo json_encode(["status" => "error", "msg" => "Data tidak lengkap"]);
     exit;
 }
 
-// Pastikan hanya bisa edit transaksi milik sendiri
-$sql = "UPDATE transactions 
-        SET title='$title', amount='$amount', is_income='$is_income', 
-            category='$category', updated_at=NOW()
-        WHERE id='$id' AND user_id='$user_id'";
-
-if ($conn->query($sql) === TRUE && $conn->affected_rows > 0) {
-    echo json_encode(["status" => "success", "msg" => "Transaksi diperbarui"]);
+if ($date) {
+    $stmt = $conn->prepare("UPDATE transactions 
+            SET title = ?, amount = ?, is_income = ?, category = ?, created_at = ?, updated_at = NOW()
+            WHERE id = ? AND user_id = ?");
+    $stmt->bind_param("sdisiii", $title, $amount, $is_income, $category, $date, $id, $user_id);
 } else {
-    echo json_encode(["status" => "error", "msg" => "Transaksi tidak ditemukan"]);
+    $stmt = $conn->prepare("UPDATE transactions 
+            SET title = ?, amount = ?, is_income = ?, category = ?, updated_at = NOW()
+            WHERE id = ? AND user_id = ?");
+    $stmt->bind_param("sdisii", $title, $amount, $is_income, $category, $id, $user_id);
 }
 
+if ($stmt->execute()) {
+    echo json_encode(["status" => "success", "msg" => "Transaksi diperbarui"]);
+} else {
+    echo json_encode(["status" => "error", "msg" => "Gagal update: " . $stmt->error]);
+}
+
+$stmt->close();
 $conn->close();
 ?>

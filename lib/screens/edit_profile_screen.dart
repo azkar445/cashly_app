@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import '../services/local_storage_service.dart';
+import '../services/api_constants.dart';
 import '../theme/app_colors.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -140,7 +141,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final uri = Uri.parse("http://10.0.2.2/keuangan_api/config/update_profile.php");
+      final uri = Uri.parse(ApiConstants.updateProfileUrl);
       final req = http.MultipartRequest('POST', uri);
 
       req.fields['user_id'] = _userId;
@@ -150,7 +151,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         req.files.add(await http.MultipartFile.fromPath('photo', _localPhoto!.path));
       }
 
-      final streamed = await req.send();
+      final streamed = await req.send().timeout(const Duration(seconds: 5));
       final res      = await http.Response.fromStream(streamed);
       final data     = jsonDecode(res.body);
 
@@ -163,7 +164,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _snack(data['msg'] ?? "Gagal memperbarui profil", isError: true);
       }
     } catch (e) {
-      _snack("Gagal terhubung ke server", isError: true);
+      // Fallback local update (berguna saat offline / demo mode)
+      final raw = await LocalStorageService.getUser();
+      if (raw != null) {
+        final u = jsonDecode(raw) as Map<String, dynamic>;
+        u['name'] = name;
+        await LocalStorageService.saveUser(jsonEncode(u));
+        _snack("Profil disimpan secara lokal ✓");
+        if (mounted) Navigator.pop(context, true);
+      } else {
+        _snack("Gagal terhubung ke server", isError: true);
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -215,9 +226,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: Container(
             width: 38, height: 38,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
+              color: Colors.white.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.white.withOpacity(0.15)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
             ),
             child: const Icon(Icons.arrow_back_ios_new_rounded,
                 color: StaticColors.white, size: 16),
@@ -247,13 +258,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
-                colors: [StaticColors.accentCyan.withOpacity(0.80), StaticColors.headerBright],
+                colors: [StaticColors.accentCyan.withValues(alpha: 0.80), StaticColors.headerBright],
                 begin: Alignment.topLeft, end: Alignment.bottomRight,
               ),
               border: Border.all(
-                  color: StaticColors.headerBright.withOpacity(0.30), width: 3),
+                  color: StaticColors.headerBright.withValues(alpha: 0.30), width: 3),
               boxShadow: [BoxShadow(
-                  color: StaticColors.headerBright.withOpacity(0.30),
+                  color: StaticColors.headerBright.withValues(alpha: 0.30),
                   blurRadius: 20, offset: const Offset(0, 6))],
             ),
             child: ClipOval(
@@ -284,7 +295,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
                 boxShadow: [BoxShadow(
-                    color: StaticColors.headerBright.withOpacity(0.40),
+                    color: StaticColors.headerBright.withValues(alpha: 0.40),
                     blurRadius: 8, offset: const Offset(0, 3))],
               ),
               child: const Icon(Icons.camera_alt_rounded,
@@ -396,7 +407,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           borderRadius: BorderRadius.circular(15),
           boxShadow: [BoxShadow(
-              color: StaticColors.headerBright.withOpacity(0.38),
+              color: StaticColors.headerBright.withValues(alpha: 0.38),
               blurRadius: 18, offset: const Offset(0, 7))],
         ),
         child: Center(child: _isLoading
